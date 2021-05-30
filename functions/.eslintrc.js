@@ -1,7 +1,6 @@
 module.exports = {
   root: true,
   env: {
-    "jsx": true,
     es6: true,
     node: true,
   },
@@ -9,6 +8,14 @@ module.exports = {
     "eslint:recommended",
     "google",
   ],
+  parserOptions: {
+    sourceType: module,
+    ecmaVersion: 8,
+    ecmaFeatures: {
+      jsx: true,
+      experimentalObjectRestSpread: true,
+    },
+  },
   rules: {
     quotes: ["error", "double"],
   },
