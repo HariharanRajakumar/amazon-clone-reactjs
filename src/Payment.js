@@ -6,11 +6,12 @@ import CurrencyFormat from 'react-currency-format';
 import { getBasketTotal } from './reducer';
 import { Link, useHistory } from 'react-router-dom';
 import axios from './axios';
+import {db} from './firebase';
 
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 
 function Payment() {
-  const [{ basket, user }] = useStateValue();
+  const [{ basket, user },dispatch] = useStateValue();
   const history = useHistory();
 
   const stripe = useStripe();
@@ -49,6 +50,21 @@ function Payment() {
         setSucceeded(true);
         setError(null);
         setProcessing(false);
+
+        db
+        .collection('users')
+        .doc(user?.uid)
+        .collection('orders')
+        .doc(paymentIntent.id)
+        .set({
+          basket: basket,
+          amount: paymentIntent.amount,
+          created: paymentIntent.created
+        })
+
+        dispatch({
+          type:'EMPTY_BASKET'
+        })
 
         history.replace('/orders');
       });
@@ -107,7 +123,7 @@ function Payment() {
                   thousandSeparator={true}
                   prefix={'$'}
                 />
-                <button disabled={processing || disabled || succeeded}>
+                <button className="payment__button" disabled={processing || disabled || succeeded}>
                   <span>{processing ? <p>Processing</p> : 'Buy Now'}</span>
                 </button>
               </div>
